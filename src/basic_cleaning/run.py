@@ -21,11 +21,6 @@ def go(args):
     # particular version of the artifact
     # artifact_local_path = run.use_artifact(args.input_artifact).file()
 
-    ######################
-    # YOUR CODE HERE     #
-    ######################
-
-
     run = wandb.init(project="nyc_airbnb", group="eda", save_code=True)
 
     local_path = wandb.use_artifact(args.input_artifact).file()
@@ -34,7 +29,11 @@ def go(args):
     idx = df['price'].between(args.min_price, args.max_price)
     df = df[idx].copy()
     # Convert last_review to datetime
+
     df['last_review'] = pd.to_datetime(df['last_review'])
+
+    idx = df['longitude'].between(-74.25, -73.50) & df['latitude'].between(40.5, 41.2)
+    df = df[idx].copy()
     df.to_csv("clean_sample.csv", index=False)
 
     artifact = wandb.Artifact(
@@ -53,14 +52,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--min_price", 
         type=float,
-        help="minimal price",
+        help="minimal price to consider",
         required=True
     )
 
     parser.add_argument(
         "--max_price", 
         type=float,
-        help="maximal price",
+        help="maximal price to consider",
         required=True
     )
 
